@@ -1,90 +1,87 @@
 package at.kraschitzer.roco;
 
+import at.kraschitzer.roco.data.CamConnector;
+import at.kraschitzer.roco.data.CamConnectorExtended;
+import at.kraschitzer.roco.exceptions.CommunicationException;
+import at.kraschitzer.roco.exceptions.FormatException;
 import at.kraschitzer.roco.util.HexCaster;
-import at.stejskal.data.CamLoco;
+import at.kraschitzer.roco.data.Loco;
+import at.kraschitzer.roco.util.IpAddressValidator;
 
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 public class ComController {
-    
+
     private static final int TARGET_ADDRESS_TRY_COUNT = 5;
-    private static final int LOCAL_ADDRESS_TRY_COUNT = 5;
-    private static final int PUBLIC_ADDRESS_TRY_COUNT = 5;
-    
     private static final int CONTROL_PORT = 5152;
-    
-    private static final String LOCAL_BROADCAST_ADDRESS = "255";
-    private static final String PUBLIC_BROADCAST_ADDRESS = "255.255.255.255";
-    
+
+    private static final int ESTABLISH_RESPONSE_EXPECTED_LENGTH = 15;
     private static final byte[] ESTABLISH_RESPONSE_EXPECTED = HexCaster.unstringify("bfffffff0b09");
     private static final byte[] ESTABLISH_REQUEST = HexCaster.unstringify("bfffffff0b");
-    
+
     private static final byte[] CAM_ON_REQUEST = HexCaster.unstringify("8fffffff4f4e00000000000000000000");
     private static final byte[] CAM_ON_RESPONSE_EXPECTED = HexCaster.unstringify("8fffffff4f4e5f4f4b00000000000000");
-    
+
     private DatagramSocket socket;
     private DataListener dataListener;
     private byte[] receiveBuffer = new byte[256];
-    
-    private boolean broadcast;
-    
-    public ComController() {
-        
+
+    public ComController() throws SocketException {
+        initializeSocket();
     }
-    
+
     public void initializeSocket() throws SocketException {
         socket = new DatagramSocket(CONTROL_PORT);
         socket.setSoTimeout(700);
     }
-    
-    public void startSpecificLoco(CamLoco loco) {
+
+    public void startLoco(CamConnector connector, String ip) throws FormatException {
+        if (!IpAddressValidator.isValid(ip)) {
+            throw new FormatException("Given string '" + ip + "' is not a valid ip");
+        }
         try {
-            
-            initializeSocket();
-            
+            Loco loco = new Loco();
+            loco.setIp(ip);
+            loco.setConnector(connector);
+
             requestLocoInfo(loco);
-            
-            requestLocoToStartCam(loco);
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            socket.close();
-        }
-    }
-    
-      
-    public void startAllLocos() {
-        try {
-            
-            initializeSocket();
-            
-            ArrayList<CamLoco> allLocos = requestLocoInfos();
-            
-            for(CamLoco loco : allLocos){
-                requestLocoToStartCam(loco);
+            if (connector instanceof CamConnectorExtended) {
+                ((CamConnectorExtended) connector).setName(loco.getName());
             }
-            
-            
+
+            requestLocoToStartCam(loco);
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             socket.close();
+            dataListener.shutDown();
         }
     }
-    
-    private void requestLocoInfo(CamLoco loco) throws IOException {
-        
-        List<DatagramPacket> recivedPackets = sendRequest(new DatagramPacket(ESTABLISH_REQUEST, ESTABLISH_REQUEST.length, loco.inetAddress, CONTROL_PORT), TARGET_ADDRESS_TRY_COUNT, ESTABLISH_RESPONSE_EXPECTED);
-        loco.socketAddress = recivedPackets.get(0).getSocketAddress();
+
+    public void stopLoco(CamConnector connector) {
+        dataListener.removeSource(connector);
     }
-    
-    private void requestLocoToStartCam(CamLoco loco) throws IOException {
-        List<DatagramPacket> res = sendRequest(new DatagramPacket(CAM_ON_REQUEST, CAM_ON_REQUEST.length, loco.socketAddress), 2, CAM_ON_RESPONSE_EXPECTED);
+
+    private void requestLocoInfo(Loco loco) throws IOException, CommunicationException {
+        List<DatagramPacket> receivedPackets = sendRequest(new DatagramPacket(ESTABLISH_REQUEST, ESTABLISH_REQUEST.length, InetAddress.getByName(loco.getIp()), CONTROL_PORT),
+                TARGET_ADDRESS_TRY_COUNT, ESTABLISH_RESPONSE_EXPECTED);
+        if (receivedPackets.size() < 1) {
+            throw new CommunicationException(loco.getIp());
+        }
+        DatagramPacket receivedPacket = receivedPackets.get(0);
+        loco.setSocketAddress(receivedPacket.getSocketAddress());
+        byte[] receivedData = receivedPacket.getData();
+        if (receivedData.length >= ESTABLISH_RESPONSE_EXPECTED_LENGTH) {
+            loco.setName(new String(receivedData).substring(ESTABLISH_RESPONSE_EXPECTED.length, ESTABLISH_RESPONSE_EXPECTED_LENGTH));
+        }
+    }
+
+    private void requestLocoToStartCam(Loco loco) throws IOException {
+        List<DatagramPacket> res = sendRequest(new DatagramPacket(CAM_ON_REQUEST, CAM_ON_REQUEST.length, loco.getSocketAddress()), 2, CAM_ON_RESPONSE_EXPECTED);
         if (!res.isEmpty()) {
             if (dataListener == null) {
                 dataListener = new DataListener();
@@ -93,25 +90,7 @@ public class ComController {
             dataListener.addSource(loco);
         }
     }
-   
 
-    private ArrayList<CamLoco> requestLocoInfos() throws IOException {
-        List<DatagramPacket> responsePackets = sendRequest(new DatagramPacket(ESTABLISH_REQUEST, ESTABLISH_REQUEST.length, InetAddress.getByName(PUBLIC_BROADCAST_ADDRESS), CONTROL_PORT),
-                PUBLIC_ADDRESS_TRY_COUNT, ESTABLISH_RESPONSE_EXPECTED);
-
-        ArrayList<CamLoco> locos = new ArrayList<>();
-        for (DatagramPacket paket : responsePackets) {
-            String ip = paket.getAddress().getHostAddress();
-            CamLoco c = new CamLoco(ip);
-            c.socketAddress = paket.getSocketAddress();
-                    
-            locos.add(c);
-        }
-
-        return locos;
-    }
-    
-    
     private List<DatagramPacket> sendRequest(DatagramPacket packet, int maxCount, byte[] expectedResponse) throws IOException {
         List<DatagramPacket> receivedPackets = new ArrayList<>();
         DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
@@ -135,5 +114,5 @@ public class ComController {
         }
         return receivedPackets;
     }
-    
+
 }

@@ -1,9 +1,9 @@
 package at.kraschitzer.roco;
 
-import at.kraschitzer.roco.util.HexCaster;
-import at.stejskal.data.CamLoco;
+import at.kraschitzer.roco.data.CamConnector;
+import at.kraschitzer.roco.data.Loco;
 
-import java.io.ByteArrayInputStream;
+import java.awt.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -20,7 +20,7 @@ public class DataListener implements Runnable {
 
     private DatagramSocket socket;
     private boolean running = true;
-    private Map<InetAddress, VidFrame> videoSources = new HashMap<>();
+    private Map<String, Loco> videoSources = new HashMap<>();
     private byte[] receiveBuffer = new byte[RECEIVE_BUFFER_LENGTH];
 
     public DataListener() throws SocketException {
@@ -38,10 +38,13 @@ public class DataListener implements Runnable {
                 packet.setData(Arrays.copyOf(packet.getData(), packet.getData().length - 4));
 
                 //System.out.println("Received " + packet.getLength() + "bytes from " + packet.getAddress());
-                for (Map.Entry<InetAddress, VidFrame> e : videoSources.entrySet()) {
-                    if (e.getKey().toString().equals(packet.getAddress().toString())) {
-                        //e.getValue().addData(receiveBuffer);
-                        e.getValue().addData(packet.getData());
+                for (Map.Entry<String, Loco> e : videoSources.entrySet()) {
+                    if (e.getKey().equals(packet.getAddress().toString())) {
+                        Loco loco = e.getValue();
+                        byte[] img = loco.getImageParser().addData(packet.getData());
+                        if (img != null) {
+                            loco.getConnector().setImage(img);
+                        }
                     }
                 }
             }
@@ -54,24 +57,23 @@ public class DataListener implements Runnable {
         }
     }
 
-    public void addSource(CamLoco loco) {
-        VidFrame vidFrame = new VidFrame(this);
-        vidFrame.setVisible(true);
-        videoSources.put(loco.inetAddress, vidFrame);
-        if (loco.startPosX != -1) {
-            vidFrame.setLocationCoordinates(loco.startPosX, loco.startPosY);
-            vidFrame.setName(loco.name);
-        }
+    public void shutDown() {
+        running = false;
+        videoSources.clear();
     }
 
-    public void removeSource(VidFrame frame) {
-        for (Map.Entry<InetAddress, VidFrame> e : videoSources.entrySet()) {
-            if (e.getValue() == frame) {
-                frame.setVisible(false);
+    public void addSource(Loco loco) {
+        videoSources.put(loco.getIp(), loco);
+    }
+
+    public void removeSource(CamConnector connector) {
+        for (Map.Entry<String, Loco> e : videoSources.entrySet()) {
+            if (e.getValue().getConnector() == connector) {
                 videoSources.remove(e.getKey());
                 System.out.println("Removed frame for source '" + e.getKey() + "'");
                 running = false;
             }
         }
     }
+
 }

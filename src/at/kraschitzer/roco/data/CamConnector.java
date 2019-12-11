@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.stejskal.data;
+package at.kraschitzer.roco.data;
 
 import java.awt.Image;
 
@@ -13,6 +13,6 @@ import java.awt.Image;
  */
 public interface CamConnector {
 
-    void setImage(Image image);
+    void setImage(byte[] image);
     
 }

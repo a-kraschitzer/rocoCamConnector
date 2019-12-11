@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.stejskal.global;
+package at.kraschitzer.roco.consumers.awt.gui;
 
-import at.stejskal.data.CamConnector;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
+import at.kraschitzer.roco.data.CamConnector;
+
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -24,7 +23,6 @@ public class ImagePanel extends javax.swing.JPanel implements CamConnector {
     private Image image;
     private Image backup;
     ImageObserver observer;
-    private String address;
 
     /**
      * Creates new form ImagePanel
@@ -67,8 +65,8 @@ public class ImagePanel extends javax.swing.JPanel implements CamConnector {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    public void setImage(Image image) {
-        this.image = image;
+    public void setImage(byte[] data) {
+        image = Toolkit.getDefaultToolkit().createImage(data);
         if(this.image.getWidth(observer)!=-1){
             repaint();
         }
@@ -89,10 +87,8 @@ public class ImagePanel extends javax.swing.JPanel implements CamConnector {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
         }
     }
-
 }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

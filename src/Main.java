@@ -1,22 +1,42 @@
-
 import at.kraschitzer.roco.ComController;
-import at.kraschitzer.roco.util.IpAddressValidator;
-import at.stejskal.data.CamConnector;
-import at.stejskal.data.CamLoco;
-import at.stejskal.global.FileOperation;
-import java.io.BufferedReader;
+import at.kraschitzer.roco.consumers.ImageFileWriter;
+import at.kraschitzer.roco.consumers.awt.gui.VidFrame;
+import at.kraschitzer.roco.exceptions.FormatException;
+
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
 
 public class Main{
 
-    public static void main(String[] args) throws SocketException, UnknownHostException, IOException {
+    public static void main(String[] args) throws IOException, FormatException {
+        writeImagesToFile();
+    }
+
+    private static void writeImagesToFile() throws SocketException, FormatException {
+        ImageFileWriter imageFileWriter = new ImageFileWriter("./out");
+        ComController comController = new ComController();
+        comController.startLoco(imageFileWriter, "192.168.1.114");
+    }
+
+    private static void showImagesInFrame() throws SocketException, FormatException {
+        VidFrame f = new VidFrame();
+        f.setVisible(true);
+        ComController comController = new ComController();
+        comController.startLoco(f.getImagePanel(), "192.168.1.114");
+    }
+
+    private static void showImagesInExtendedFrame() throws SocketException, FormatException {
+        VidFrame f = new VidFrame();
+        f.setVisible(true);
+        ComController comController = new ComController();
+        comController.startLoco(f.getImagePanel(), "192.168.1.114");
+    }
+
+    private static void startLocoForImagePanel() {
 //        Scanner s = new Scanner(System.in);
 //        String input = "";
 //
@@ -46,6 +66,8 @@ public class Main{
 //            System.out.println("invalid input '" + input + "'");
 //        }
 
+        /*
+        READ FROM INI/cams.ini
         ArrayList<CamLoco> locos = new ArrayList<>();
 
         BufferedReader br = FileOperation.loadData("INI/cams.ini");
@@ -56,17 +78,18 @@ public class Main{
             locos.add(new CamLoco(values[0], Integer.parseInt(values[1]), Integer.parseInt(values[2]), values[3]));
             line = br.readLine();
         }
-        
+
         ComController com = new ComController();
-        
+
         for (CamLoco loco : locos) {
             com.startSpecificLoco(loco);
 
         }
-        
-        
-        
-        
+         */
+
+
+
+
 //        com.startAllLocos();
     }
     
