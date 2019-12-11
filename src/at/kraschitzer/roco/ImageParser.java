@@ -19,10 +19,6 @@ public class ImageParser {
     private boolean imageStartPartly = false;
     private boolean imageEndPartly = false;
 
-    public Image addDataForImg(byte[] data) {
-        return Toolkit.getDefaultToolkit().createImage(addData(data));
-    }
-
     public byte[] addData(byte[] data) {
         byte[] im = null;
         for (int offset = 0; offset < data.length; offset++) {

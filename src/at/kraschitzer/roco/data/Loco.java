@@ -11,11 +11,20 @@ import java.net.SocketAddress;
 
 public class Loco {
 
+    private int imageCount;
     private String ip;
     private String name;
     private CamConnector connector;
     private SocketAddress socketAddress;
     private ImageParser imageParser;
+
+    public int getImageCount() {
+        return imageCount;
+    }
+
+    public void setImageCount(int imageCount) {
+        this.imageCount = imageCount;
+    }
 
     public String getIp() {
         return ip;

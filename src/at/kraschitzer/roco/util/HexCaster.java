@@ -1,7 +1,5 @@
 package at.kraschitzer.roco.util;
 
-import java.lang.reflect.Array;
-
 public class HexCaster {
     public static byte[] unstringify(String hexString) {
         byte[] result;

@@ -2,9 +2,12 @@ package at.kraschitzer.roco;
 
 import at.kraschitzer.roco.data.CamConnector;
 import at.kraschitzer.roco.data.Loco;
+import at.kraschitzer.roco.util.HexCaster;
 
 import java.awt.*;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -17,6 +20,7 @@ public class DataListener implements Runnable {
 
     private static final int DATA_PORT = 5153;
     private static final int RECEIVE_BUFFER_LENGTH = 1028;
+    private static final int COUNT_LENGTH = 4;
 
     private DatagramSocket socket;
     private boolean running = true;
@@ -31,19 +35,18 @@ public class DataListener implements Runnable {
         try {
             while (running || !videoSources.isEmpty()) {
                 DatagramPacket packet = new DatagramPacket(receiveBuffer, receiveBuffer.length);
-                //System.out.println("Waiting to receive...");
                 socket.receive(packet);
 
-                // ########### shorten array 4 bytes due to counter
-                packet.setData(Arrays.copyOf(packet.getData(), packet.getData().length - 4));
-
-                //System.out.println("Received " + packet.getLength() + "bytes from " + packet.getAddress());
+                int imageCount = new BigInteger(HexCaster.stringify(Arrays.copyOfRange(packet.getData(), packet.getData().length - COUNT_LENGTH, packet.getData().length)), 16).intValue();
                 for (Map.Entry<String, Loco> e : videoSources.entrySet()) {
                     if (e.getKey().equals(packet.getAddress().toString())) {
                         Loco loco = e.getValue();
-                        byte[] img = loco.getImageParser().addData(packet.getData());
-                        if (img != null) {
-                            loco.getConnector().setImage(img);
+                        if (imageCount > loco.getImageCount()) {
+                            byte[] img = loco.getImageParser().addData(Arrays.copyOf(packet.getData(), packet.getData().length - COUNT_LENGTH));
+                            if (img != null) {
+                                loco.getConnector().setImage(img);
+                            }
+                            loco.setImageCount(imageCount);
                         }
                     }
                 }
@@ -63,6 +66,7 @@ public class DataListener implements Runnable {
     }
 
     public void addSource(Loco loco) {
+        loco.setImageParser(new ImageParser());
         videoSources.put(loco.getIp(), loco);
     }
 
