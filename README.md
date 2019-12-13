@@ -5,7 +5,7 @@ Roco H0 locomotive and use them in whatever way you desire.
 
 ## Getting Started
 
-Clone this repository, or download the /owner/name/releases/latest/download/roco_cam_connector.jar .jar
+Clone this repository, or download the [Latest Release](https://github.com/a-kraschitzer/rocoCamConnector/releases/latest) .jar
 and add it as a library to your project.
 
 - Implement the `CamConnector` wherever you want the images to end up
@@ -26,9 +26,7 @@ and add it as a library to your project.
 
 ## Authors
 
-* **Andreas Kraschitzer** - *General Programming* - [github](https://github.com/a-kraschitzer)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+* **Andreas Kraschitzer** - [github](https://github.com/a-kraschitzer)
 
 ## License
 
