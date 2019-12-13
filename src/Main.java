@@ -63,10 +63,16 @@ public class Main {
         comController.startLoco(f.getImagePanel(), ip);
     }
 
-    private static void showImagesInExtendedFrame(String ip) throws SocketException, FormatException {
+    private static void showImagesInExtendedFrame(String ip) {
         VidFrame f = new VidFrame();
         f.setVisible(true);
-        ComController comController = new ComController();
-        comController.startLoco(f.getImagePanel(), ip);
+        try {
+            ComController comController = new ComController();
+            comController.startLoco(f.getImagePanel(), ip);
+        } catch (SocketException | FormatException e) {
+            e.printStackTrace();
+            f.setVisible(false);
+            System.exit(1);
+        }
     }
 }
