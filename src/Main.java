@@ -1,7 +1,7 @@
-import at.kraschitzer.roco.ComController;
-import at.kraschitzer.roco.consumers.ImageFileWriter;
-import at.kraschitzer.roco.consumers.awt.gui.VidFrame;
-import at.kraschitzer.roco.exceptions.FormatException;
+import net.kraschitzer.roco.ComController;
+import net.kraschitzer.roco.consumers.ImageFileWriter;
+import net.kraschitzer.roco.consumers.awt.gui.VidFrame;
+import net.kraschitzer.roco.exceptions.FormatException;
 
 import java.io.IOException;
 

@@ -1,4 +1,4 @@
-package at.kraschitzer.roco.data;
+package net.kraschitzer.roco.data;
 
 public interface CamConnectorExtended extends CamConnector {
     void setName(String name);

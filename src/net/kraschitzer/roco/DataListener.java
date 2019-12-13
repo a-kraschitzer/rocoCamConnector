@@ -1,8 +1,8 @@
-package at.kraschitzer.roco;
+package net.kraschitzer.roco;
 
-import at.kraschitzer.roco.data.CamConnector;
-import at.kraschitzer.roco.data.Loco;
-import at.kraschitzer.roco.util.HexCaster;
+import net.kraschitzer.roco.data.CamConnector;
+import net.kraschitzer.roco.data.Loco;
+import net.kraschitzer.roco.util.HexCaster;
 
 import java.io.IOException;
 import java.math.BigInteger;

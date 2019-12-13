@@ -1,6 +1,6 @@
-package at.kraschitzer.roco.consumers;
+package net.kraschitzer.roco.consumers;
 
-import at.kraschitzer.roco.data.CamConnector;
+import net.kraschitzer.roco.data.CamConnector;
 
 import java.io.File;
 import java.io.FileOutputStream;

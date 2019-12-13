@@ -1,4 +1,4 @@
-package at.kraschitzer.roco.util;
+package net.kraschitzer.roco.util;
 
 public class HexCaster {
     public static byte[] unstringify(String hexString) {

@@ -1,12 +1,17 @@
-package at.kraschitzer.roco.consumers.awt.gui.extended.gui;
+package net.kraschitzer.roco.consumers.awt.gui;
 
-import java.awt.Color;
+import net.kraschitzer.roco.data.CamConnector;
+
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
 
-public class ImagePanel extends javax.swing.JPanel {
+/**
+ *
+ * @author Norbert
+ */
+public class ImagePanel extends javax.swing.JPanel implements CamConnector {
 
     private Image image;
     private Image backup;
@@ -39,7 +44,7 @@ public class ImagePanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setBackground(new Color(0, 0, 0));
+        setBackground(new java.awt.Color(0, 0, 0));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

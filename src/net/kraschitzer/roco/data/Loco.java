@@ -1,6 +1,6 @@
-package at.kraschitzer.roco.data;
+package net.kraschitzer.roco.data;
 
-import at.kraschitzer.roco.ImageParser;
+import net.kraschitzer.roco.ImageParser;
 
 import java.net.SocketAddress;
 

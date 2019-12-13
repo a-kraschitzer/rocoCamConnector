@@ -1,4 +1,4 @@
-package at.kraschitzer.roco.util;
+package net.kraschitzer.roco.util;
 
 import java.util.regex.Pattern;
 

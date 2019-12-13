@@ -8,10 +8,10 @@ Roco H0 locomotive and use them in whatever way you desire.
 Clone this repository, or download the /owner/name/releases/latest/download/roco_cam_connector.jar .jar
 and add it as a library to your project.
 
-- Implement the `at.kraschitzer.roco.data.CamConnector` wherever you want the images to end up
+- Implement the `CamConnector` wherever you want the images to end up
 - Implement the `setImage(byte[] img)` method. (Here you can display the data in a JFrame/web page or write it to a file.)
-- The last step is to create an instance of `at.kraschitzer.roco.ComController`
-- And pass an instance of the class that implements the `at.kraschitzer.roco.data.CamConnector` with the ip of the locomotive.
+- The last step is to create an instance of `ComController`
+- And pass an instance of the class that implements the `CamConnector` with the ip of the locomotive.
 
         ComController comController = new ComController();
         comController.startLoco(imageFileWriter, "192.168.1.114");

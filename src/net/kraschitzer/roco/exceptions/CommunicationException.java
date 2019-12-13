@@ -1,4 +1,4 @@
-package at.kraschitzer.roco.exceptions;
+package net.kraschitzer.roco.exceptions;
 
 public class CommunicationException extends Exception{
 

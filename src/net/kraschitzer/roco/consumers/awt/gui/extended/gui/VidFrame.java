@@ -1,24 +1,14 @@
-package at.kraschitzer.roco.consumers.awt.gui;
+package net.kraschitzer.roco.consumers.awt.gui.extended.gui;
 
-public class VidFrame extends javax.swing.JFrame {
+import net.kraschitzer.roco.data.CamConnectorExtended;
+
+public class VidFrame extends javax.swing.JFrame implements CamConnectorExtended {
 
     /**
      * Creates new form VideoJFrame
      */
     public VidFrame() {
         initComponents();
-    }
-
-    public ImagePanel getImagePanel() {
-        return videoPanel;
-    }
-
-    public void setLocationCoordinates(int x, int y) {
-        this.setLocation(x, y);
-    }
-
-    public void setName(String name) {
-        this.setTitle(name);
     }
 
     /**
@@ -86,6 +76,16 @@ public class VidFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exitButton;
     private ImagePanel videoPanel;
+
+    @Override
+    public void setImage(byte[] image) {
+        videoPanel.setImage(image);
+    }
+
+    @Override
+    public void setName(String name) {
+        this.setTitle(name);
+    }
     // End of variables declaration//GEN-END:variables
 
 }

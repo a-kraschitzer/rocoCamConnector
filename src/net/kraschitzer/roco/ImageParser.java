@@ -1,6 +1,6 @@
-package at.kraschitzer.roco;
+package net.kraschitzer.roco;
 
-import at.kraschitzer.roco.util.HexCaster;
+import net.kraschitzer.roco.util.HexCaster;
 
 import java.util.Arrays;
 
