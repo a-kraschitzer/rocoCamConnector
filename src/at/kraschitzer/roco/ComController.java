@@ -2,14 +2,18 @@ package at.kraschitzer.roco;
 
 import at.kraschitzer.roco.data.CamConnector;
 import at.kraschitzer.roco.data.CamConnectorExtended;
+import at.kraschitzer.roco.data.Loco;
 import at.kraschitzer.roco.exceptions.CommunicationException;
 import at.kraschitzer.roco.exceptions.FormatException;
 import at.kraschitzer.roco.util.HexCaster;
-import at.kraschitzer.roco.data.Loco;
 import at.kraschitzer.roco.util.IpAddressValidator;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -3,12 +3,9 @@ import at.kraschitzer.roco.consumers.ImageFileWriter;
 import at.kraschitzer.roco.consumers.awt.gui.VidFrame;
 import at.kraschitzer.roco.exceptions.FormatException;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import java.net.SocketException;
-import java.net.UnknownHostException;
 
 public class Main{
 

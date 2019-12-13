@@ -1,23 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.kraschitzer.roco.consumers.awt.gui;
 
-import at.kraschitzer.roco.DataListener;
-import at.kraschitzer.roco.ImageParser;
-import at.kraschitzer.roco.consumers.awt.gui.ImagePanel;
-import at.kraschitzer.roco.util.HexCaster;
-
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.util.Arrays;
-
-/**
- *
- * @author Norbert
- */
 public class VidFrame extends javax.swing.JFrame {
 
     /**

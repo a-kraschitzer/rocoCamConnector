@@ -4,13 +4,10 @@ import at.kraschitzer.roco.data.CamConnector;
 import at.kraschitzer.roco.data.Loco;
 import at.kraschitzer.roco.util.HexCaster;
 
-import java.awt.*;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.Arrays;
 import java.util.HashMap;

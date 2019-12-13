@@ -2,7 +2,6 @@ package at.kraschitzer.roco;
 
 import at.kraschitzer.roco.util.HexCaster;
 
-import java.awt.*;
 import java.util.Arrays;
 
 public class ImageParser {
