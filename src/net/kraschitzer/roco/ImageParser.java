@@ -45,6 +45,10 @@ public class ImageParser {
         return im;
     }
 
+    public void discardImageData() {
+        withinImage = false;
+    }
+
     private boolean checkForImageStart(byte[] receiveBuffer, int offset) {
         if (receiveBuffer[offset] == IMAGE_START[0] && offset < receiveBuffer.length - 1 && receiveBuffer[offset + 1] == IMAGE_START[1]) {
             return true;
