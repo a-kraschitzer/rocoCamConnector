@@ -36,7 +36,7 @@ public class DataListener implements Runnable {
 
                 int imageCount = new BigInteger(HexCaster.stringify(Arrays.copyOfRange(packet.getData(), packet.getData().length - COUNT_LENGTH, packet.getData().length)), 16).intValue();
                 for (Map.Entry<String, Loco> e : videoSources.entrySet()) {
-                    if (e.getKey().equals(packet.getAddress().toString())) {
+                    if (e.getKey().equals(packet.getAddress().getHostAddress())) {
                         Loco loco = e.getValue();
                         if (imageCount > loco.getImageCount()) {
                             byte[] img = loco.getImageParser().addData(Arrays.copyOf(packet.getData(), packet.getData().length - COUNT_LENGTH));

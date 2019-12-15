@@ -1,4 +1,5 @@
-import net.kraschitzer.roco.ComController;
+package net.kraschitzer.roco;
+
 import net.kraschitzer.roco.consumers.ImageFileWriter;
 import net.kraschitzer.roco.consumers.awt.gui.VidFrame;
 import net.kraschitzer.roco.exceptions.FormatException;
@@ -7,7 +8,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.util.Scanner;
 
-public class Main {
+public class RocoCamApp {
 
     private enum Mode {
         FRAME,

@@ -60,9 +60,6 @@ public class ComController {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            socket.close();
-            dataListener.shutDown();
         }
     }
 
