@@ -47,6 +47,8 @@ public class ImageParser {
 
     public void discardImageData() {
         withinImage = false;
+        imageStartPartly = false;
+        imageEndPartly = false;
     }
 
     private boolean checkForImageStart(byte[] receiveBuffer, int offset) {
@@ -54,6 +56,7 @@ public class ImageParser {
             return true;
         }
         if (imageStartPartly && receiveBuffer[0] == IMAGE_START[1]) {
+            imageStartPartly = false;
             return true;
         }
         if (receiveBuffer[offset] == IMAGE_START[0] && offset == receiveBuffer.length - 1) {
@@ -67,6 +70,7 @@ public class ImageParser {
             return true;
         }
         if (imageEndPartly && receiveBuffer[0] == IMAGE_END[1]) {
+            imageEndPartly = false;
             return true;
         }
         if (receiveBuffer[offset] == IMAGE_END[0] && offset == receiveBuffer.length - 1) {

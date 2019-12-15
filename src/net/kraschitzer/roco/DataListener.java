@@ -59,7 +59,7 @@ public class DataListener implements Runnable {
                             if (img != null) {
                                 loco.getConnector().setImage(img);
                             }
-                            loco.setPackageCount(imageCount);
+                            loco.setPackageCount(packageCount);
                         }
                     }
                 }
