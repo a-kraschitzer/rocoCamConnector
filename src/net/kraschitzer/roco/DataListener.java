@@ -17,9 +17,11 @@ public class DataListener implements Runnable {
 
     private static final int DATA_PORT = 5153;
     private static final int RECEIVE_BUFFER_LENGTH = 1028;
-    private static final int COUNT_LENGTH = 2;
+    private static final int META_DATA_LENGTH = 4;
     private static final int PACKAGE_COUNT_OFFSET_FROM_BACK = 4;
+    private static final int PACKAGE_COUNT_LENGTH = 2;
     private static final int IMAGE_COUNT_OFFSET_FROM_BACK = 2;
+    private static final int IMAGE_COUNT_LENGTH = 1;
 
     private DatagramSocket socket;
     private boolean running = true;
@@ -39,18 +41,18 @@ public class DataListener implements Runnable {
                 int imageCount = new BigInteger(
                         HexCaster.stringifyInvertByteOrder(Arrays.copyOfRange(packet.getData(),
                                 packet.getData().length - IMAGE_COUNT_OFFSET_FROM_BACK,
-                                packet.getData().length - IMAGE_COUNT_OFFSET_FROM_BACK + COUNT_LENGTH))
+                                packet.getData().length - IMAGE_COUNT_OFFSET_FROM_BACK + IMAGE_COUNT_LENGTH))
                         , 16).intValue();
                 int packageCount = new BigInteger(
                         HexCaster.stringifyInvertByteOrder(Arrays.copyOfRange(packet.getData(),
                                 packet.getData().length - PACKAGE_COUNT_OFFSET_FROM_BACK,
-                                packet.getData().length - PACKAGE_COUNT_OFFSET_FROM_BACK + COUNT_LENGTH))
+                                packet.getData().length - PACKAGE_COUNT_OFFSET_FROM_BACK + PACKAGE_COUNT_LENGTH))
                         , 16).intValue();
                 for (Map.Entry<String, Loco> e : videoSources.entrySet()) {
                     if (e.getKey().equals(packet.getAddress().getHostAddress())) {
                         Loco loco = e.getValue();
-                        if (packageCount > loco.getPackageCount()) {
-                            byte[] img = loco.getImageParser().addData(Arrays.copyOf(packet.getData(), packet.getData().length - COUNT_LENGTH), imageCount);
+                        if (didPackageCountIncrease(loco.getPackageCount(), packageCount)) {
+                            byte[] img = loco.getImageParser().addData(Arrays.copyOf(packet.getData(), packet.getData().length - META_DATA_LENGTH), imageCount);
                             if (img != null) {
                                 loco.getConnector().setImage(img);
                             }
@@ -59,13 +61,23 @@ public class DataListener implements Runnable {
                     }
                 }
             }
-            System.out.println("Leaving loop di loop");
+            System.out.println("Shutting down DataListener.");
         } catch (IOException e) {
             System.out.println("Caught exception");
             e.printStackTrace();
         } finally {
             socket.close();
         }
+    }
+
+    private boolean didPackageCountIncrease(int oldPackageCount, int newPackageCount) {
+        if (newPackageCount > oldPackageCount) {
+            return true;
+        }
+        if ((oldPackageCount - newPackageCount) > 10000) {
+            return true;
+        }
+        return false;
     }
 
     public void shutDown() {

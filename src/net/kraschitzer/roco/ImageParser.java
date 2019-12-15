@@ -22,7 +22,7 @@ public class ImageParser {
     public byte[] addData(byte[] data, int imageCount) {
         byte[] im = null;
         for (int offset = 0; offset < data.length; offset++) {
-            if (withinImage) {
+            if (withinImage && (imageCount == currentImageCount || (imageCount - 1) == currentImageCount)) {
                 if (checkForImageEnd(data, offset)) {
                     imageBuffer[imageBufferCnt++] = IMAGE_END[0];
                     imageBuffer[imageBufferCnt++] = IMAGE_END[1];
@@ -32,7 +32,7 @@ public class ImageParser {
                 }
                 imageBuffer[imageBufferCnt++] = data[offset];
             }
-            if ((!withinImage || imageCount > currentImageCount) && checkForImageStart(data, offset)) {
+            if ((!withinImage || didImageCountIncrease(currentImageCount, imageCount)) && checkForImageStart(data, offset)) {
                 currentImageCount = imageCount;
                 imageBuffer = new byte[IMAGE_BUFFER_LENGTH];
                 imageBuffer[0] = IMAGE_START[0];
@@ -67,6 +67,16 @@ public class ImageParser {
         }
         if (receiveBuffer[offset] == IMAGE_END[0] && offset == receiveBuffer.length - 1) {
             imageEndPartly = true;
+        }
+        return false;
+    }
+
+    private boolean didImageCountIncrease(int oldImageCount, int newImageCount) {
+        if (newImageCount > oldImageCount) {
+            return true;
+        }
+        if ((oldImageCount - newImageCount) > 50) {
+            return true;
         }
         return false;
     }
