@@ -55,7 +55,7 @@ public class ImageParser {
         if (receiveBuffer[offset] == IMAGE_START[0] && offset < receiveBuffer.length - 1 && receiveBuffer[offset + 1] == IMAGE_START[1]) {
             return true;
         }
-        if (imageStartPartly && receiveBuffer[0] == IMAGE_START[1]) {
+        if (imageStartPartly && receiveBuffer[0] == IMAGE_START[1] && offset == 0) {
             imageStartPartly = false;
             return true;
         }
@@ -69,7 +69,7 @@ public class ImageParser {
         if (receiveBuffer[offset] == IMAGE_END[0] && offset < receiveBuffer.length - 1 && receiveBuffer[offset + 1] == IMAGE_END[1]) {
             return true;
         }
-        if (imageEndPartly && receiveBuffer[0] == IMAGE_END[1]) {
+        if (imageEndPartly && receiveBuffer[0] == IMAGE_END[1] && offset == 0) {
             imageEndPartly = false;
             return true;
         }
