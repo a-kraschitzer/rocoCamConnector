@@ -13,12 +13,13 @@ public class ImageParser {
 
     private byte[] imageBuffer = new byte[IMAGE_BUFFER_LENGTH];
 
+    private int currentImageCount = 0;
     private int imageBufferCnt = 0;
     private boolean withinImage = false;
     private boolean imageStartPartly = false;
     private boolean imageEndPartly = false;
 
-    public byte[] addData(byte[] data) {
+    public byte[] addData(byte[] data, int imageCount) {
         byte[] im = null;
         for (int offset = 0; offset < data.length; offset++) {
             if (withinImage) {
@@ -30,7 +31,9 @@ public class ImageParser {
                     continue;
                 }
                 imageBuffer[imageBufferCnt++] = data[offset];
-            } else if (checkForImageStart(data, offset)) {
+            }
+            if ((!withinImage || imageCount > currentImageCount) && checkForImageStart(data, offset)) {
+                currentImageCount = imageCount;
                 imageBuffer = new byte[IMAGE_BUFFER_LENGTH];
                 imageBuffer[0] = IMAGE_START[0];
                 imageBuffer[1] = IMAGE_START[1];

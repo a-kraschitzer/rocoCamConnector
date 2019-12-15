@@ -6,19 +6,19 @@ import java.net.SocketAddress;
 
 public class Loco {
 
-    private int imageCount;
+    private int packageCount;
     private String ip;
     private String name;
     private CamConnector connector;
     private SocketAddress socketAddress;
     private ImageParser imageParser;
 
-    public int getImageCount() {
-        return imageCount;
+    public int getPackageCount() {
+        return packageCount;
     }
 
-    public void setImageCount(int imageCount) {
-        this.imageCount = imageCount;
+    public void setPackageCount(int packageCount) {
+        this.packageCount = packageCount;
     }
 
     public String getIp() {

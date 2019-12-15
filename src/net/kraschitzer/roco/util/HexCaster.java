@@ -25,6 +25,14 @@ public class HexCaster {
         return result;
     }
 
+    public static String stringifyInvertByteOrder(byte[] bytes) {
+        StringBuilder result = new StringBuilder();
+        for (int i = bytes.length - 1; i >= 0; i--) {
+            result.append(String.format("%02x", bytes[i]));
+        }
+        return result.toString();
+    }
+
     public static String stringify(byte[] bytes) {
         StringBuilder result = new StringBuilder();
         for (byte aByte : bytes) {

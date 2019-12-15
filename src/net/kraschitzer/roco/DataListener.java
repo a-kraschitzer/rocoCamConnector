@@ -17,7 +17,9 @@ public class DataListener implements Runnable {
 
     private static final int DATA_PORT = 5153;
     private static final int RECEIVE_BUFFER_LENGTH = 1028;
-    private static final int COUNT_LENGTH = 4;
+    private static final int COUNT_LENGTH = 2;
+    private static final int PACKAGE_COUNT_OFFSET_FROM_BACK = 4;
+    private static final int IMAGE_COUNT_OFFSET_FROM_BACK = 2;
 
     private DatagramSocket socket;
     private boolean running = true;
@@ -34,16 +36,25 @@ public class DataListener implements Runnable {
                 DatagramPacket packet = new DatagramPacket(receiveBuffer, receiveBuffer.length);
                 socket.receive(packet);
 
-                int imageCount = new BigInteger(HexCaster.stringify(Arrays.copyOfRange(packet.getData(), packet.getData().length - COUNT_LENGTH, packet.getData().length)), 16).intValue();
+                int imageCount = new BigInteger(
+                        HexCaster.stringifyInvertByteOrder(Arrays.copyOfRange(packet.getData(),
+                                packet.getData().length - IMAGE_COUNT_OFFSET_FROM_BACK,
+                                packet.getData().length - IMAGE_COUNT_OFFSET_FROM_BACK + COUNT_LENGTH))
+                        , 16).intValue();
+                int packageCount = new BigInteger(
+                        HexCaster.stringifyInvertByteOrder(Arrays.copyOfRange(packet.getData(),
+                                packet.getData().length - PACKAGE_COUNT_OFFSET_FROM_BACK,
+                                packet.getData().length - PACKAGE_COUNT_OFFSET_FROM_BACK + COUNT_LENGTH))
+                        , 16).intValue();
                 for (Map.Entry<String, Loco> e : videoSources.entrySet()) {
                     if (e.getKey().equals(packet.getAddress().getHostAddress())) {
                         Loco loco = e.getValue();
-                        if (imageCount > loco.getImageCount()) {
-                            byte[] img = loco.getImageParser().addData(Arrays.copyOf(packet.getData(), packet.getData().length - COUNT_LENGTH));
+                        if (packageCount > loco.getPackageCount()) {
+                            byte[] img = loco.getImageParser().addData(Arrays.copyOf(packet.getData(), packet.getData().length - COUNT_LENGTH), imageCount);
                             if (img != null) {
                                 loco.getConnector().setImage(img);
                             }
-                            loco.setImageCount(imageCount);
+                            loco.setPackageCount(imageCount);
                         }
                     }
                 }
