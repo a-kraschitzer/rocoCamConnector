@@ -53,7 +53,7 @@ public class DataListener implements Runnable {
                         Loco loco = e.getValue();
                         if (didPackageCountIncrease(loco.getPackageCount(), packageCount)) {
                             if (packageCount != (loco.getPackageCount() + 1)) {
-                                loco.getImageParser().discardImageData();
+                                loco.getImageParser().resetImageData();
                             }
                             byte[] img = loco.getImageParser().addData(Arrays.copyOf(packet.getData(), packet.getData().length - META_DATA_LENGTH), imageCount);
                             if (img != null) {

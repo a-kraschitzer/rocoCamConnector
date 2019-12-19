@@ -32,35 +32,49 @@ public class ImageParser {
                 }
                 imageBuffer[imageBufferCnt++] = data[offset];
             }
-            if ((!withinImage || didImageCountIncrease(currentImageCount, imageCount)) && checkForImageStart(data, offset)) {
-                currentImageCount = imageCount;
-                imageBuffer = new byte[IMAGE_BUFFER_LENGTH];
-                imageBuffer[0] = IMAGE_START[0];
-                imageBuffer[1] = IMAGE_START[1];
-                imageBufferCnt = 2;
-                offset++;
-                withinImage = true;
+            if (!withinImage || didImageCountIncrease(currentImageCount, imageCount)) {
+                if (checkForPartlyImageStart(data, offset)) {
+                    initializeImage(imageCount);
+                } else if (checkForImageStart(data, offset)) {
+                    initializeImage(imageCount);
+                    offset++;
+                }
             }
         }
         return im;
     }
 
-    public void discardImageData() {
+    public void resetImageData() {
         withinImage = false;
         imageStartPartly = false;
         imageEndPartly = false;
     }
 
-    private boolean checkForImageStart(byte[] receiveBuffer, int offset) {
-        if (receiveBuffer[offset] == IMAGE_START[0] && offset < receiveBuffer.length - 1 && receiveBuffer[offset + 1] == IMAGE_START[1]) {
-            return true;
-        }
+    private void initializeImage(int imageCount) {
+        resetImageData();
+        currentImageCount = imageCount;
+        imageBuffer = new byte[IMAGE_BUFFER_LENGTH];
+        imageBuffer[0] = IMAGE_START[0];
+        imageBuffer[1] = IMAGE_START[1];
+        imageBufferCnt = 2;
+        withinImage = true;
+    }
+
+    private boolean checkForPartlyImageStart(byte[] receiveBuffer, int offset) {
         if (imageStartPartly && receiveBuffer[0] == IMAGE_START[1] && offset == 0) {
             imageStartPartly = false;
             return true;
         }
         if (receiveBuffer[offset] == IMAGE_START[0] && offset == receiveBuffer.length - 1) {
             imageStartPartly = true;
+            return false;
+        }
+        return false;
+    }
+
+    private boolean checkForImageStart(byte[] receiveBuffer, int offset) {
+        if (receiveBuffer[offset] == IMAGE_START[0] && offset < receiveBuffer.length - 1 && receiveBuffer[offset + 1] == IMAGE_START[1]) {
+            return true;
         }
         return false;
     }
