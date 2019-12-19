@@ -18,12 +18,21 @@ public class ImageParser {
     private boolean withinImage = false;
     private boolean imageStartPartly = false;
     private boolean imageEndPartly = false;
+    private String ipAddress = "";
+    private boolean debug = false;
 
-    public byte[] addData(byte[] data, int imageCount) {
+    public ImageParser(boolean debug, String ipAddress) {
+        this.debug = debug;
+        this.ipAddress = ipAddress;
+    }
+
+    public byte[] addData(byte[] data, int newImageCount) {
         byte[] im = null;
+        log("ImageCount: (old=" + currentImageCount + ", new=" + newImageCount + ")");
         for (int offset = 0; offset < data.length; offset++) {
-            if (withinImage && (imageCount == currentImageCount || (imageCount - 1) == currentImageCount)) {
+            if (withinImage && (newImageCount == currentImageCount || (newImageCount - 1) == currentImageCount)) {
                 if (checkForImageEnd(data, offset)) {
+                    log("<- ImageEnd: offset=" + offset + ", imgBufferOffset=" + imageBufferCnt);
                     imageBuffer[imageBufferCnt++] = IMAGE_END[0];
                     imageBuffer[imageBufferCnt++] = IMAGE_END[1];
                     im = Arrays.copyOf(imageBuffer, imageBufferCnt);
@@ -32,11 +41,13 @@ public class ImageParser {
                 }
                 imageBuffer[imageBufferCnt++] = data[offset];
             }
-            if (!withinImage || didImageCountIncrease(currentImageCount, imageCount)) {
+            if (!withinImage || didImageCountIncrease(currentImageCount, newImageCount)) {
                 if (checkForPartlyImageStart(data, offset)) {
-                    initializeImage(imageCount);
+                    log("-> ImagePartlyStart: offset=" + offset);
+                    initializeImage(newImageCount);
                 } else if (checkForImageStart(data, offset)) {
-                    initializeImage(imageCount);
+                    log("<- ImageStart: offset=" + offset);
+                    initializeImage(newImageCount);
                     offset++;
                 }
             }
@@ -101,5 +112,11 @@ public class ImageParser {
             return true;
         }
         return false;
+    }
+
+    private void log(String s) {
+        if (debug) {
+            System.out.println("[" + ipAddress + "] " + s);
+        }
     }
 }

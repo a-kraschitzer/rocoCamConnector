@@ -32,9 +32,15 @@ public class ComController {
     private DatagramSocket socket;
     private DataListener dataListener;
     private byte[] receiveBuffer = new byte[256];
+    private boolean debug = false;
 
     public ComController() throws SocketException {
         initializeSocket();
+    }
+
+    public ComController(boolean debug) throws SocketException {
+        initializeSocket();
+        this.debug = debug;
     }
 
     public void initializeSocket() throws SocketException {
@@ -85,7 +91,7 @@ public class ComController {
         List<DatagramPacket> res = sendRequest(new DatagramPacket(CAM_ON_REQUEST, CAM_ON_REQUEST.length, loco.getSocketAddress()), 2, CAM_ON_RESPONSE_EXPECTED);
         if (!res.isEmpty()) {
             if (dataListener == null) {
-                dataListener = new DataListener();
+                dataListener = new DataListener(debug);
                 new Thread(dataListener).start();
             }
             dataListener.addSource(loco);
@@ -97,23 +103,29 @@ public class ComController {
         DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
         int tryCount = 0;
         while (receivedPackets.isEmpty() && tryCount < maxCount) {
-            System.out.println("<-- Sending to " + packet.getAddress() + ":" + packet.getPort() + " hex='" + HexCaster.stringify(packet.getData()) + "' ascii='" + new String(packet.getData()) + "' len=" + packet.getLength());
+            log("<-- Sending to " + packet.getAddress() + ":" + packet.getPort() + " hex='" + HexCaster.stringify(packet.getData()) + "' ascii='" + new String(packet.getData()) + "' len=" + packet.getLength());
             socket.send(packet);
             try {
                 while (true) {
                     socket.receive(receivePacket);
-                    System.out.println("--> Received from " + receivePacket.getSocketAddress() + " hex='" + HexCaster.stringify(receivePacket.getData()) + "' ascii='" + new String(receivePacket.getData()) + "' len=" + packet.getLength());
+                    log("--> Received from " + receivePacket.getSocketAddress() + " hex='" + HexCaster.stringify(receivePacket.getData()) + "' ascii='" + new String(receivePacket.getData()) + "' len=" + packet.getLength());
                     if (HexCaster.compareByteArraysFromStart(expectedResponse, receivePacket.getData(), expectedResponse.length)) {
                         receivedPackets.add(receivePacket);
                     }
                 }
             } catch (SocketTimeoutException e) {
-                System.out.println(" -- timeout");
+                log(" -- timeout");
             } finally {
                 tryCount++;
             }
         }
         return receivedPackets;
+    }
+
+    private void log(String s) {
+        if (debug) {
+            System.out.println(s);
+        }
     }
 
 }
