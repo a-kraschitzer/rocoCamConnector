@@ -72,13 +72,16 @@ public class ImageParser {
     }
 
     private boolean checkForPartlyImageStart(byte[] receiveBuffer, int offset) {
-        if (imageStartPartly && receiveBuffer[0] == IMAGE_START[1] && offset == 0) {
+        if (offset == 0 || offset == receiveBuffer.length - 1) {
+            if (imageStartPartly && receiveBuffer[0] == IMAGE_START[1] && offset == 0) {
+                imageStartPartly = false;
+                return true;
+            }
+            if (receiveBuffer[offset] == IMAGE_START[0] && offset == receiveBuffer.length - 1) {
+                imageStartPartly = true;
+                return false;
+            }
             imageStartPartly = false;
-            return true;
-        }
-        if (receiveBuffer[offset] == IMAGE_START[0] && offset == receiveBuffer.length - 1) {
-            imageStartPartly = true;
-            return false;
         }
         return false;
     }
@@ -91,15 +94,18 @@ public class ImageParser {
     }
 
     private boolean checkForImageEnd(byte[] receiveBuffer, int offset) {
-        if (receiveBuffer[offset] == IMAGE_END[0] && offset < receiveBuffer.length - 1 && receiveBuffer[offset + 1] == IMAGE_END[1]) {
-            return true;
-        }
-        if (imageEndPartly && receiveBuffer[0] == IMAGE_END[1] && offset == 0) {
+        if (offset == 0 || offset == receiveBuffer.length - 1) {
+            if (receiveBuffer[offset] == IMAGE_END[0] && offset < receiveBuffer.length - 1 && receiveBuffer[offset + 1] == IMAGE_END[1]) {
+                return true;
+            }
+            if (imageEndPartly && receiveBuffer[0] == IMAGE_END[1] && offset == 0) {
+                imageEndPartly = false;
+                return true;
+            }
+            if (receiveBuffer[offset] == IMAGE_END[0] && offset == receiveBuffer.length - 1) {
+                imageEndPartly = true;
+            }
             imageEndPartly = false;
-            return true;
-        }
-        if (receiveBuffer[offset] == IMAGE_END[0] && offset == receiveBuffer.length - 1) {
-            imageEndPartly = true;
         }
         return false;
     }
