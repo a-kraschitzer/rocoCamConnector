@@ -1,4 +1,4 @@
-package net.kraschitzer.roco.consumers.awt.gui;
+package net.kraschitzer.roco.examples.consumers.awt.gui;
 
 public class VidFrame extends javax.swing.JFrame {
 

@@ -1,4 +1,4 @@
-package net.kraschitzer.roco.consumers;
+package net.kraschitzer.roco.examples.consumers;
 
 import net.kraschitzer.roco.data.CamConnector;
 

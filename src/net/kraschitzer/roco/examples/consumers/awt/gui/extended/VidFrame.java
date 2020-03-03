@@ -1,4 +1,4 @@
-package net.kraschitzer.roco.consumers.awt.gui.extended.gui;
+package net.kraschitzer.roco.examples.consumers.awt.gui.extended;
 
 import net.kraschitzer.roco.data.CamConnectorExtended;
 

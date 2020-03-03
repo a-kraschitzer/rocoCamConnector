@@ -15,12 +15,17 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ComController {
 
     private static final int TARGET_ADDRESS_TRY_COUNT = 5;
+    private static final int PUBLIC_ADDRESS_TRY_COUNT = 2;
     private static final int CONTROL_PORT = 5152;
+
+    private static final String PUBLIC_BROADCAST_ADDRESS = "255.255.255.255";
 
     private static final int ESTABLISH_RESPONSE_EXPECTED_LENGTH = 15;
     private static final byte[] ESTABLISH_RESPONSE_EXPECTED = HexCaster.unstringify("bfffffff0b09");
@@ -48,9 +53,12 @@ public class ComController {
         socket.setSoTimeout(700);
     }
 
-    public void startLoco(CamConnector connector, String ip) throws FormatException {
+    public void connectLoco(CamConnector connector, String ip) throws FormatException, CommunicationException {
         if (!IpAddressValidator.isValid(ip)) {
             throw new FormatException("Given string '" + ip + "' is not a valid ip");
+        }
+        if (connector == null) {
+            throw new CommunicationException("The given connector is invalid");
         }
         try {
             Loco loco = new Loco();
@@ -69,8 +77,19 @@ public class ComController {
         }
     }
 
-    public void stopLoco(CamConnector connector) {
+    public void disconnectLoco(CamConnector connector) {
         dataListener.removeSource(connector);
+    }
+
+    public List<String> findLocos() {
+        try {
+            List<DatagramPacket> responsePackets = sendRequest(new DatagramPacket(ESTABLISH_REQUEST, ESTABLISH_REQUEST.length, InetAddress.getByName(PUBLIC_BROADCAST_ADDRESS), CONTROL_PORT),
+                    PUBLIC_ADDRESS_TRY_COUNT, ESTABLISH_RESPONSE_EXPECTED);
+            return responsePackets.stream().map(DatagramPacket::getAddress).map(InetAddress::getHostAddress).collect(Collectors.toList());
+        } catch (IOException e) {
+            log("Failed to send Request: " + e.getMessage());
+        }
+        return Collections.emptyList();
     }
 
     private void requestLocoInfo(Loco loco) throws IOException, CommunicationException {
@@ -127,5 +146,4 @@ public class ComController {
             System.out.println(s);
         }
     }
-
 }
