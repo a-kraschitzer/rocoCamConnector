@@ -9,15 +9,10 @@ import net.kraschitzer.roco.util.HexCaster;
 import net.kraschitzer.roco.util.IpAddressValidator;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ComController {
 
@@ -85,7 +80,11 @@ public class ComController {
         try {
             List<DatagramPacket> responsePackets = sendRequest(new DatagramPacket(ESTABLISH_REQUEST, ESTABLISH_REQUEST.length, InetAddress.getByName(PUBLIC_BROADCAST_ADDRESS), CONTROL_PORT),
                     PUBLIC_ADDRESS_TRY_COUNT, ESTABLISH_RESPONSE_EXPECTED);
-            return responsePackets.stream().map(DatagramPacket::getAddress).map(InetAddress::getHostAddress).collect(Collectors.toList());
+            List<String> list = new ArrayList<>();
+            for (DatagramPacket responsePacket : responsePackets) {
+                list.add(responsePacket.getAddress().getHostAddress());
+            }
+            return list;
         } catch (IOException e) {
             log("Failed to send Request: " + e.getMessage());
         }
@@ -96,7 +95,7 @@ public class ComController {
         List<DatagramPacket> receivedPackets = sendRequest(new DatagramPacket(ESTABLISH_REQUEST, ESTABLISH_REQUEST.length, InetAddress.getByName(loco.getIp()), CONTROL_PORT),
                 TARGET_ADDRESS_TRY_COUNT, ESTABLISH_RESPONSE_EXPECTED);
         if (receivedPackets.size() < 1) {
-            throw new CommunicationException(loco.getIp());
+            throw new CommunicationException("No response from Loco '" + loco.getIp() + "' received.");
         }
         DatagramPacket receivedPacket = receivedPackets.get(0);
         loco.setSocketAddress(receivedPacket.getSocketAddress());

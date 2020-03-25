@@ -26,9 +26,9 @@ public class RocoCamApp {
         String ip;
         String outDir = null;
 
-        System.out.println("Please select the mode you want to start in:");
-        System.out.println("*1 Frame");
-        System.out.println("2 Files");
+        System.out.println("Please select the mode you want to start in (* is the default option):");
+        System.out.println("*1 Frame - Display received images in a JFrame");
+        System.out.println("2 Files - Write received images to files");
         input = s.nextLine();
         if ("2".equals(input)) {
             mode = Mode.FILES;
@@ -52,6 +52,7 @@ public class RocoCamApp {
                 System.exit(1);
             }
             ip = ips.get(0);
+            System.out.println("Found loco at " + ip);
         }
 
         CamConnector connector = null;
