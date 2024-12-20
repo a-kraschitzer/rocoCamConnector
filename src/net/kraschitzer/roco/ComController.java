@@ -45,7 +45,7 @@ public class ComController {
 
     public void initializeSocket() throws SocketException {
         socket = new DatagramSocket(CONTROL_PORT);
-        socket.setSoTimeout(700);
+        socket.setSoTimeout(2000);
     }
 
     public void connectLoco(CamConnector connector, String ip) throws FormatException, CommunicationException {
